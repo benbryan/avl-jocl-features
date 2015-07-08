@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -19,7 +20,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class FeatureGeneratorJOCL_Example extends javax.swing.JFrame {
+public class Demo extends javax.swing.JFrame {
    
     private void kernelPlotter() {
                 
@@ -112,15 +113,11 @@ public class FeatureGeneratorJOCL_Example extends javax.swing.JFrame {
         ArrayList<Plane> planes = new ArrayList<>();
         ArrayList<Feature> features = new ArrayList<>();
 //        features.add(new Feature(Feature.Names.Mean));
+        features.add(new Feature(Feature.Names.Moment2));
+        features.add(new Feature(Feature.Names.ContrastSum));
         features.add(new Feature(Feature.Names.Gabor_d0r0));
         features.add(new Feature(Feature.Names.Gabor_d0r1));
         features.add(new Feature(Feature.Names.Gabor_d0r2));
-        features.add(new Feature(Feature.Names.Gabor_d1r0));
-        features.add(new Feature(Feature.Names.Gabor_d1r1));
-        features.add(new Feature(Feature.Names.Gabor_d1r2));
-        features.add(new Feature(Feature.Names.Gabor_d2r0));
-        features.add(new Feature(Feature.Names.Gabor_d2r1));
-        features.add(new Feature(Feature.Names.Gabor_d2r2));
         features.add(new Feature(Feature.Names.Gabor_d3r0));
         features.add(new Feature(Feature.Names.Gabor_d3r1));
         features.add(new Feature(Feature.Names.Gabor_d3r2));
@@ -145,14 +142,22 @@ public class FeatureGeneratorJOCL_Example extends javax.swing.JFrame {
         return samples;
     }
 
-    private BufferedImage loadImage(File f) {
+    private BufferedImage getImage(){
         try {
-            BufferedImage imgIn = ImageIO.read(f);
-            return imgIn;
+            InputStream stream = getClass().getResourceAsStream("Library_of_Texas_Tech_University.JPG");
+            if (stream == null){
+                System.err.println("Could not find target image");
+                System.exit(-1);
+            }
+            BufferedImage image = ImageIO.read(stream);
+            if (image == null){
+                System.err.println("Could not read target image");
+                System.exit(-2);
+            }
+            return image;
         } catch (IOException ex) {
-            System.err.println("Failed to load the input image " + f.getAbsolutePath());
-            Logger.getLogger(FeatureGeneratorJOCL_Example.class.getName()).log(Level.SEVERE, null, ex);
-            System.exit(-1);
+            System.err.println("Failed to load the demo image");
+            Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
@@ -206,7 +211,7 @@ public class FeatureGeneratorJOCL_Example extends javax.swing.JFrame {
         return stats;
     }
     
-    public FeatureGeneratorJOCL_Example() {
+    public Demo() {
         initComponents();
 
 //        kernelPlotter();
@@ -215,7 +220,8 @@ public class FeatureGeneratorJOCL_Example extends javax.swing.JFrame {
 //        }
         
         // Load the target image
-        final BufferedImage imgTarget = loadImage(new File("C:\\Users\\benbryan\\Desktop\\wolf-furry_00339248.jpg"));
+        final BufferedImage imgTarget = getImage();
+        
         final int tileSize = 20;
         
         ArrayList<Sample> samples = collectSamples(imgTarget, tileSize);
@@ -240,7 +246,7 @@ public class FeatureGeneratorJOCL_Example extends javax.swing.JFrame {
         try {
             results = generator.getFeaturesForImages(sampleImagesAll);
         } catch (Throwable ex) {
-            Logger.getLogger(FeatureGeneratorJOCL_Example.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
             return;
         } 
 
@@ -358,21 +364,19 @@ public class FeatureGeneratorJOCL_Example extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FeatureGeneratorJOCL_Example.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FeatureGeneratorJOCL_Example.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FeatureGeneratorJOCL_Example.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FeatureGeneratorJOCL_Example.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Demo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FeatureGeneratorJOCL_Example().setVisible(true);
+                new Demo().setVisible(true);
             }
         });
     }
